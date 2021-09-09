@@ -1,7 +1,7 @@
 /api/analytics/prometheus-metrics/virtualservice: 
   entity_name: []
-  tenant: ["argocd@dds-np","metrics-monitoring@dds-np"]
+  tenant: ["argocd@np","metrics-monitoring@np"]
 
 /api/analytics/prometheus-metrics/serviceengine:
-  entity_name: ['lin2dv2kub3w3--se','lin2dv2kub3w4--se']
+  entity_name: ['kubenode1--se','kubnode2--se']
   tenant: []
