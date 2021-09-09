@@ -15,7 +15,7 @@ cargo install --git https://github.com/findelabs/avi-metrics-exporter.git
 
 ```
 USAGE:
-    avi-exporter [OPTIONS] --config <FILE> --controller <AVI_CONTROLLER> --password <AVI_PASSWORD> --username <AVI_USERNAME>
+    avi-metrics-exporter [OPTIONS] --config <FILE> --controller <AVI_CONTROLLER> --password <AVI_PASSWORD> --username <AVI_USERNAME>
 
 FLAGS:
     -h, --help       Prints help information
