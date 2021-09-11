@@ -23,7 +23,10 @@ pub type Config = Arc<RwLock<HashMap<String, ConfigEntry>>>;
 pub struct ConfigEntry {
     #[serde(default)]
     pub entity_name: Vec<String>,
-    pub tenant: Vec<String>
+    pub tenant: Vec<String>,
+    pub metric_id: Vec<String>,
+    #[serde(default)]
+    pub description: bool
 }
 
 #[derive(Debug, Clone)]
@@ -288,12 +291,20 @@ impl AviClient {
                     // Create new vec for queries
                     let mut queries = Vec::new();
                     
-                    if tenant != "empty" {
-                        queries.push(("tenant", tenant.clone()));
+                    if &entry.tenant.len() > &0 {
+                        queries.push(("tenant", entry.tenant.join(",").clone()));
                     };
 
                     if &entry.entity_name.len() > &0 {
                         queries.push(("entity_name", entry.entity_name.join(",").clone()));
+                    };
+
+                    if &entry.metric_id.len() > &0 {
+                        queries.push(("metric_id", entry.metric_id.join(",").clone()));
+                    };
+
+                    if &entry.description == &true {
+                        queries.push(("description", "true".to_owned()));
                     };
 
                     let response = match me.get(&uri, queries).await {
