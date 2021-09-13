@@ -181,12 +181,13 @@ impl AviClient {
             .await?;
 
         // Will need to handle bad logins somehow
-        let expires = match response.cookies().find(|x| x.name() == "avi-sessionid").map(|x| x.max_age().unwrap().as_secs()) {
+        let expires = match response.cookies().find(|x| x.name() == "avi-sessionid").map(|x| (x.value().to_string(), x.max_age().unwrap().as_secs())) {
             Some(e) => {
                 log::info!("Picked up new csrf token");
+                log::trace!("Registered crsf token of {}", e.0);
 
                 // Update max_age for new token
-                self.expires = Utc::now().timestamp() + e as i64;
+                self.expires = Utc::now().timestamp() + e.1 as i64;
                 self.expires
             },
             None => {
