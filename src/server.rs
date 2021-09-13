@@ -298,8 +298,9 @@ impl AviClient {
                     // Create new vec for queries
                     let mut queries = Vec::new();
                     
-                    if &entry.tenant.len() > &0 {
-                        queries.push(("tenant", entry.tenant.join(",").clone()));
+                    // This is unique, if tenant is empty, that means no tenant was specified in the config
+                    if tenant != "empty" {
+                        queries.push(("tenant", tenant.clone().to_string()));
                     };
 
                     if &entry.entity_name.len() > &0 {
