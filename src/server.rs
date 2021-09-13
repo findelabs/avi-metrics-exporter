@@ -23,7 +23,9 @@ pub type Config = Arc<RwLock<HashMap<String, ConfigEntry>>>;
 pub struct ConfigEntry {
     #[serde(default)]
     pub entity_name: Vec<String>,
+    #[serde(default)]
     pub tenant: Vec<String>,
+    #[serde(default)]
     pub metric_id: Vec<String>,
     #[serde(default)]
     pub description: bool
@@ -179,17 +181,21 @@ impl AviClient {
             .await?;
 
         // Will need to handle bad logins somehow
-        let (_csrf_token, max_age) = match response.cookies().find(|x| x.name() == "avi-sessionid").map(|x| (x.value().to_string(), x.max_age().unwrap().as_secs())) {
+        let expires = match response.cookies().find(|x| x.name() == "avi-sessionid").map(|x| x.max_age().unwrap().as_secs()) {
             Some(e) => {
-                log::debug!("Got back csrf token of: {}", e.0);
-                e
-            },
-            None => ("error".to_string(), 0u64)
-        };
+                log::info!("Picked up new csrf token");
 
-        // Update max_age for new token
-        self.expires = Utc::now().timestamp() + max_age as i64;
-        Ok("Login Ok".to_owned())
+                // Update max_age for new token
+                self.expires = Utc::now().timestamp() + e as i64;
+                self.expires
+            },
+            None => {
+                log::info!("Failed getting csrf token");
+                self.expires = 0;
+                self.expires
+            }
+        };
+        Ok(format!("Login expires in {}", expires))
     }
 
     pub async fn headers() -> BoxResult<HeaderMap> {
@@ -222,6 +228,7 @@ impl AviClient {
 
     async fn renew(&mut self) -> BoxResult<()> {
         if self.expires - Utc::now().timestamp() <= 0 {
+            log::info!("renew function kicking off re-login function");
             self.login().await?;
         }
         Ok(())
