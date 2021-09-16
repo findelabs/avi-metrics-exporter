@@ -187,7 +187,8 @@ impl AviClient {
                 log::trace!("Registered crsf token of {}", e.0);
 
                 // Update max_age for new token
-                self.expires = Utc::now().timestamp() + e.1 as i64;
+                let new_expires = Utc::now().timestamp() + e.1 as i64;
+                self.expires = new_expires;
                 self.expires
             },
             None => {
